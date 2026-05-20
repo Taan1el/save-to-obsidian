@@ -1,0 +1,18 @@
+# dependencies
+node_modules/
+
+# generated output
+chatgpt-export/
+test-output/
+
+# never commit private chat data
+conversations.json
+*.zip
+chat.html
+user.json
+message_feedback.json
+model_comparisons.json
+
+# os
+.DS_Store
+Thumbs.db

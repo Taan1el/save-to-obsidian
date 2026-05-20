@@ -1,0 +1,60 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Obsidian Vault Saver",
+    "description": "Saves a markdown note into the user's Obsidian vault GitHub repository (ChatGPT folder).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO/contents/ChatGPT" }
+  ],
+  "paths": {
+    "/{filename}": {
+      "put": {
+        "operationId": "saveNoteToObsidian",
+        "summary": "Create a markdown note in the ChatGPT folder of the Obsidian vault.",
+        "description": "Commits a single markdown file. The content field MUST be base64-encoded UTF-8.",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "description": "Hyphenated .md filename, no spaces or slashes. Example: 2026-05-20-budget-planning.md",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message", "content"],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Git commit message, e.g. 'Add note: Budget planning'."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Base64-encoded UTF-8 markdown content of the note."
+                  },
+                  "branch": {
+                    "type": "string",
+                    "description": "Target branch.",
+                    "default": "main"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "File created" },
+          "200": { "description": "File updated" },
+          "422": { "description": "File already exists or validation error" }
+        }
+      }
+    }
+  }
+}

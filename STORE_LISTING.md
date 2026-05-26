@@ -39,5 +39,4 @@ The extension does not execute remote code. AI provider calls happen in the loca
 - Host `PRIVACY.md` at a public URL and use that URL in the Chrome Web Store dashboard.
 - Set Chrome Web Store privacy disclosures to match `PRIVACY.md`.
 - After publication assigns a stable extension ID, set helper `ALLOWED_EXTENSION_ORIGIN=chrome-extension://<published-extension-id>` in public setup docs.
-- Choose and add an open-source license before publishing source publicly.
 - Create final screenshots from the packaged extension, not a development mock.

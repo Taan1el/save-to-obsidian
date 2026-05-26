@@ -1,0 +1,15 @@
+{
+  "mode": "full",
+  "chat_url": "https://chatgpt.com/c/example",
+  "title": "Browser extension Obsidian helper",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Build a browser extension that saves ChatGPT conversations into Obsidian."
+    },
+    {
+      "role": "assistant",
+      "content": "Use a Manifest V3 extension for extraction and a local FastAPI helper for secure vault writes."
+    }
+  ]
+}

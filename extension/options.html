@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChatGPT Obsidian Saver Options</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="mark" aria-hidden="true">
+          <img src="icons/icon-48.png" alt="" width="30" height="30">
+        </span>
+        <div>
+          <h1>Obsidian Saver</h1>
+          <p>Local helper settings</p>
+        </div>
+      </header>
+
+      <form>
+        <label>
+          <span>Helper URL</span>
+          <input id="helper-url" type="url" placeholder="http://127.0.0.1:8766">
+        </label>
+        <label>
+          <span>Helper token</span>
+          <input id="helper-token" type="password" autocomplete="off">
+        </label>
+        <button id="save-options" type="button">Save settings</button>
+      </form>
+
+      <p id="status" role="status"></p>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChatGPT Obsidian Saver</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="popup-shell" aria-label="ChatGPT Obsidian Saver">
+    <header class="topbar">
+      <div class="mark" aria-hidden="true">
+        <img src="icons/icon-48.png" alt="" width="26" height="26">
+      </div>
+
+      <div class="title-group">
+        <h1>Obsidian Saver</h1>
+        <div class="helper-line" id="helperLine">
+          <span class="status-dot is-checking" id="statusDot" aria-hidden="true"></span>
+          <span id="helperText">Checking helper...</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="detected-chip" aria-label="Detected page">
+      <span>Detected</span>
+      <strong>ChatGPT</strong>
+      <span aria-hidden="true">.</span>
+      <span>local vault</span>
+    </section>
+
+    <section class="actions" aria-label="Save actions">
+      <button class="action-button is-primary" type="button" data-mode="full">
+        <span class="button-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 3.75h7.2L18 7.55v12.7H7V3.75Z" />
+            <path d="M14 4v4h4" />
+            <path d="M9.75 11.25h5.5M9.75 14h5.5M9.75 16.75h3.5" />
+          </svg>
+        </span>
+        <span>
+          <strong>Save full</strong>
+          <small>Visible conversation</small>
+        </span>
+      </button>
+
+      <button class="action-button" type="button" data-mode="summary">
+        <span class="button-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 6.5h14M5 10h10.5M5 13.5h14M5 17h8" />
+          </svg>
+        </span>
+        <span>
+          <strong>Save summary</strong>
+          <small>Condensed visible chat</small>
+        </span>
+      </button>
+
+      <button class="action-button" type="button" data-mode="main-idea">
+        <span class="button-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 18.25h6" />
+            <path d="M9.7 15.25h4.6" />
+            <path d="M12 3.75a5.8 5.8 0 0 0-3.25 10.6c.45.31.75.82.75 1.37v.03h5v-.03c0-.55.3-1.06.75-1.37A5.8 5.8 0 0 0 12 3.75Z" />
+          </svg>
+        </span>
+        <span>
+          <strong>Save main idea</strong>
+          <small>Core takeaway only</small>
+        </span>
+      </button>
+    </section>
+
+    <section class="message" id="messageBox" role="status" aria-live="polite">
+      Ready
+    </section>
+
+    <footer class="footer">
+      <span class="local-pill" title="Saves through your localhost helper">
+        <span aria-hidden="true"></span>
+        Local helper
+      </span>
+      <button class="options-link" id="openOptions" type="button">Options</button>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

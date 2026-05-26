@@ -1,0 +1,327 @@
+:root {
+  --os-bg: #1e1e1f;
+  --os-bg-elev: #262628;
+  --os-bg-input: #2a2a2c;
+  --os-bg-sunk: #18181a;
+  --os-hover: rgba(255,255,255,.04);
+  --os-hover-2: rgba(255,255,255,.07);
+  --os-border: rgba(255,255,255,.07);
+  --os-border-strong: rgba(255,255,255,.13);
+  --os-border-accent: oklch(0.6 0.18 285 / .5);
+  --os-text: #e3e3e5;
+  --os-text-muted: #8a8a92;
+  --os-text-dim: #5b5b62;
+  --os-text-on-accent: #ffffff;
+  --os-accent: oklch(0.62 0.2 285);
+  --os-accent-hover: oklch(0.68 0.2 285);
+  --os-accent-soft: oklch(0.62 0.2 285 / .16);
+  --os-success: oklch(0.74 0.16 150);
+  --os-success-soft: oklch(0.74 0.16 150 / .14);
+  --os-warning: oklch(0.76 0.14 70);
+  --os-warning-soft: oklch(0.76 0.14 70 / .14);
+  --os-danger: oklch(0.68 0.18 25);
+  --os-danger-soft: oklch(0.68 0.18 25 / .14);
+  --os-radius: 8px;
+  --os-radius-sm: 5px;
+  --os-radius-lg: 12px;
+  --focus: 0 0 0 3px oklch(0.62 0.2 285 / .34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 380px;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  color: var(--os-text);
+  background: var(--os-bg);
+  font: 13px/1.35 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.popup-shell {
+  position: relative;
+  width: 380px;
+  padding: 0;
+  background: var(--os-bg);
+  border: 1px solid rgba(255,255,255,.05);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 24px 60px -28px rgba(0,0,0,.7);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: var(--os-bg);
+  border-bottom: 1px solid var(--os-border);
+}
+
+.mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  flex: 0 0 auto;
+  background: var(--os-bg-elev);
+  border: 1px solid var(--os-border);
+  border-radius: calc(var(--os-radius) - 2px);
+}
+
+.mark img {
+  display: block;
+  height: 25px;
+  object-fit: contain;
+  width: 25px;
+}
+
+.title-group {
+  min-width: 0;
+}
+
+h1 {
+  margin: 0;
+  color: var(--os-text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.helper-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 18px;
+  margin-top: 2px;
+  color: var(--os-text-muted);
+  font-size: 11px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--os-warning);
+}
+
+.status-dot.is-ready {
+  background: var(--os-success);
+  box-shadow: none;
+}
+
+.status-dot.is-offline {
+  background: var(--os-danger);
+  box-shadow: none;
+}
+
+.detected-chip {
+  align-items: center;
+  background: var(--os-bg-elev);
+  border: 1px solid var(--os-border);
+  border-radius: var(--os-radius-sm);
+  color: var(--os-text-muted);
+  display: flex;
+  font-size: 11.5px;
+  gap: 8px;
+  margin: 12px 14px 10px;
+  padding: 7px 10px;
+}
+
+.detected-chip strong {
+  color: var(--os-text);
+  font-weight: 500;
+}
+
+.status-dot.is-checking {
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+.actions {
+  display: grid;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+.action-button {
+  align-items: center;
+  background: var(--os-bg-elev);
+  border: 1px solid var(--os-border);
+  border-radius: var(--os-radius);
+  color: var(--os-text);
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 12px;
+  text-align: left;
+  transition: transform .08s ease, background .15s ease, border-color .15s ease;
+  width: 100%;
+}
+
+.action-button:hover {
+  background: var(--os-hover-2);
+  border-color: var(--os-border-strong);
+  transform: translateY(-1px);
+}
+
+.action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 0 rgba(255,255,255,.9), 0 4px 12px rgba(30, 18, 48, .08);
+}
+
+.action-button:focus-visible,
+.options-link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.action-button.is-primary {
+  background: var(--os-accent);
+  border-color: transparent;
+  color: var(--os-text-on-accent);
+}
+
+.action-button.is-primary .button-icon {
+  background: rgba(255,255,255,.14);
+  color: #fff;
+}
+
+.action-button.is-primary small {
+  color: rgba(255,255,255,.66);
+}
+
+.action-button.is-loading {
+  pointer-events: none;
+  opacity: .76;
+}
+
+.action-button.is-loading .button-icon {
+  animation: pulse .9s ease-in-out infinite;
+}
+
+.button-icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--os-text-muted);
+  background: var(--os-bg-sunk);
+  border-radius: var(--os-radius-sm);
+}
+
+.button-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.action-button strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.action-button small {
+  display: block;
+  margin-top: 1px;
+  color: var(--os-text-muted);
+  font-size: 11.5px;
+}
+
+.message {
+  background: var(--os-bg-sunk);
+  border: 1px solid var(--os-border);
+  border-radius: var(--os-radius-sm);
+  color: var(--os-text-muted);
+  margin: 12px 14px 0;
+  min-height: 36px;
+  overflow-wrap: anywhere;
+  padding: 9px 10px;
+}
+
+.message.is-success {
+  background: var(--os-success-soft);
+  border-color: color-mix(in oklab, var(--os-success) 26%, transparent);
+  color: var(--os-success);
+}
+
+.message.is-error {
+  background: var(--os-danger-soft);
+  border-color: color-mix(in oklab, var(--os-danger) 26%, transparent);
+  color: var(--os-danger);
+}
+
+.message.is-working {
+  background: var(--os-accent-soft);
+  border-color: var(--os-border-accent);
+  color: var(--os-text);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--os-bg);
+  border-top: 1px solid var(--os-border);
+}
+
+.local-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--os-text-muted);
+  font-size: 11px;
+}
+
+.local-pill span {
+  width: 6px;
+  height: 6px;
+  background: var(--os-success);
+  border-radius: 999px;
+}
+
+.options-link {
+  padding: 5px 2px 5px 8px;
+  color: var(--os-accent);
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+
+.options-link:hover {
+  color: var(--os-accent-hover);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-button,
+  .status-dot,
+  .action-button.is-loading .button-icon {
+    animation: none;
+    transition: none;
+  }
+}

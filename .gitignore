@@ -1,11 +1,22 @@
-# dependencies
-node_modules/
+# local helper config and secrets
+.env
+.env.*
+!.env.example
 
-# generated output
-chatgpt-export/
-test-output/
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 
-# never commit private chat data
+# helper runtime output
+helper/*.log
+helper/logs/
+
+# packaged builds
+dist/
+
+# private exports and local data
 conversations.json
 *.zip
 chat.html
@@ -13,6 +24,7 @@ user.json
 message_feedback.json
 model_comparisons.json
 
-# os
+# OS/editor files
 .DS_Store
 Thumbs.db
+.vscode/

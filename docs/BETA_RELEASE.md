@@ -40,7 +40,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\capture-media.ps1
 Share:
 
 ```text
-dist\chatgpt-obsidian-saver-extension.zip
+dist\save-to-obsidian-extension.zip
 README.md
 ```
 

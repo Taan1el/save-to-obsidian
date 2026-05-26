@@ -7,7 +7,7 @@ Set-Location $ProjectRoot
 
 $Dist = Join-Path $ProjectRoot "dist"
 New-Item -ItemType Directory -Force -Path $Dist | Out-Null
-$Zip = Join-Path $Dist "chatgpt-obsidian-saver-extension.zip"
+$Zip = Join-Path $Dist "save-to-obsidian-extension.zip"
 if (Test-Path -LiteralPath $Zip) {
     Remove-Item -LiteralPath $Zip -Force
 }

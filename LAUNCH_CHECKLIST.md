@@ -28,7 +28,7 @@ cd "C:\Users\YOUR_NAME\Documents\save-to-obsidian"
 
 Verified on 2026-05-22:
 
-- `package-extension.ps1` passed all validation gates and produced `dist\chatgpt-obsidian-saver-extension.zip`.
+- `package-extension.ps1` passed all validation gates and produced `dist\save-to-obsidian-extension.zip`.
 - Helper health returned `{ "ok": true }` on `http://127.0.0.1:8766`.
 - Unauthorized `/save` returned `401`.
 - `/docs` returned `404` with `HELPER_DEV=0`.
@@ -38,13 +38,12 @@ Verified on 2026-05-22:
 - `PRIVACY.md`, `SECURITY.md`, and `STORE_LISTING.md` were added for public release disclosures and permission justification.
 - Secret scan covers OpenAI, Anthropic, Gemini/Google, Groq-style, OpenAI-compatible, and helper-token patterns outside ignored `.env`.
 - Headless Chrome extraction smoke and fresh popup screenshot smoke passed.
-- Known machine caveat: another process still listens on `127.0.0.1:8765`; this project now uses `8766`.
-- Public release caveat: choose a license and host the privacy policy before publishing source or submitting to the Chrome Web Store.
+- Public release caveat: host the privacy policy before submitting to the Chrome Web Store.
 
 ## Manual Browser Smoke Test
 
 1. Open `chrome://extensions`.
-2. Reload `ChatGPT Obsidian Saver`.
+2. Reload `Save to Obsidian`.
 3. Open extension options.
 4. Confirm helper URL is `http://127.0.0.1:8766` on this machine.
 5. Open a ChatGPT conversation.

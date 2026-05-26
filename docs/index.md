@@ -1,4 +1,4 @@
-# ChatGPT Obsidian Saver
+# Save to Obsidian
 
 - [Privacy policy](privacy.md)
 - [Beta release checklist](BETA_RELEASE.md)

@@ -57,12 +57,6 @@ try {
     Write-Host "helper not running on 8766; static/test gates still passed"
 }
 
-Write-Host "== Stale helper port check =="
-$stale8765 = Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue
-if ($stale8765) {
-    Write-Host "warning: stale helper/process is still listening on 8765; launch config uses 8766"
-}
-
 Write-Host "== Headless browser smoke =="
 & .\scripts\browser-smoke.ps1
 

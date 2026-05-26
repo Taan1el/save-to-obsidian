@@ -1,6 +1,6 @@
 # Privacy Policy
 
-ChatGPT Obsidian Saver has one purpose: save the visible ChatGPT conversation you choose into a local Obsidian vault through a helper app running on your own computer.
+Save to Obsidian has one purpose: save the visible ChatGPT conversation you choose into a local Obsidian vault through a helper app running on your own computer.
 
 ## Data Handled
 

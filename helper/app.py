@@ -21,7 +21,7 @@ TOKEN_HEADER = "X-Obsidian-Saver-Token"
 
 settings_at_startup = load_settings()
 app = FastAPI(
-    title="ChatGPT Obsidian Saver Helper",
+    title="Save to Obsidian Helper",
     version="0.1.0",
     docs_url="/docs" if settings_at_startup.helper_dev else None,
     redoc_url="/redoc" if settings_at_startup.helper_dev else None,

@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
-Write-Host "Setting up ChatGPT Obsidian Saver helper..."
+Write-Host "Setting up Save to Obsidian helper..."
 
 if (-not (Get-Command py -ErrorAction SilentlyContinue) -and -not (Get-Command python -ErrorAction SilentlyContinue)) {
     throw "Python is not installed or not on PATH. Install Python 3.11+ first."

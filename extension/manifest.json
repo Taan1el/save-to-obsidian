@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ChatGPT Obsidian Saver",
+  "name": "Save to Obsidian",
   "version": "0.1.0",
   "description": "Save visible ChatGPT conversations to a local Obsidian vault through a localhost helper.",
   "icons": {
@@ -27,7 +27,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Save ChatGPT to Obsidian",
+    "default_title": "Save to Obsidian",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",

@@ -10,7 +10,7 @@ Save visible ChatGPT conversations to local Obsidian Markdown notes through a se
 
 ## Detailed Description
 
-ChatGPT Obsidian Saver adds a small popup on ChatGPT pages with three actions: save the visible conversation, save a summary, or save the main idea. The extension sends the selected conversation content to a helper app running on your own computer. The helper writes clean Markdown notes with YAML frontmatter into your configured Obsidian vault folder.
+Save to Obsidian adds a small popup on ChatGPT pages with three actions: save the visible conversation, save a summary, or save the main idea. The extension sends the selected conversation content to a helper app running on your own computer. The helper writes clean Markdown notes with YAML frontmatter into your configured Obsidian vault folder.
 
 The extension does not write to the filesystem, does not include a GitHub token, and does not include AI provider API keys. Full saves work without AI. Summary and main idea modes use the provider configured in the local helper.
 

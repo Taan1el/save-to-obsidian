@@ -70,7 +70,7 @@ the dashboard form.
 
 ### Optional Polish
 
-- Add a minimal `docs/_config.yml` with `title: ChatGPT Obsidian Saver` for
+- Add a minimal `docs/_config.yml` with `title: Save to Obsidian` for
   a cleaner page header.
 - Add `docs/index.md` pointing at `privacy.md` and the GitHub repo so the
   root of the Pages site is not a 404.
@@ -116,7 +116,7 @@ A clean sequence for the first submission:
 1. Run `.\scripts\validate.ps1` and `.\scripts\package-extension.ps1`.
 2. Push the public repo (with `LICENSE`, `PRIVACY.md`, `docs/privacy.md`).
 3. Enable GitHub Pages and confirm the privacy URL loads.
-4. Upload `dist\chatgpt-obsidian-saver-extension.zip` to the Chrome Web
+4. Upload `dist\save-to-obsidian-extension.zip` to the Chrome Web
    Store dashboard.
 5. Paste the GitHub Pages privacy URL into the dashboard.
 6. Fill in permission justifications from `STORE_LISTING.md`.

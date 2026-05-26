@@ -1,91 +1,205 @@
-# chatgpt-to-obsidian
+# Save to Obsidian
 
-Turn your ChatGPT history into clean Obsidian notes — one markdown file per conversation, with proper frontmatter, no fuss.
+Save ChatGPT conversations straight into your local Obsidian vault.
 
-I made this because my ChatGPT chats kept piling up somewhere I never looked at again. They belong in my notes, next to everything else I think about. So this takes the export ChatGPT gives you and drops it into your vault as real, searchable, linkable notes.
+No Markdown downloads. No copy-paste cleanup. No API keys in the browser.
 
-No accounts, no API keys, no cloud anything. It's one small script that runs locally and only uses Node's built-ins.
+![Save to Obsidian popup](media/popup-ready.png)
 
-```mermaid
-flowchart LR
-    A[ChatGPT export<br/>conversations.json] --> B[chatgpt-to-obsidian]
-    B --> C[One .md note<br/>per conversation]
-    C --> D[(Your Obsidian vault)]
+## What this is
+
+Save to Obsidian is a Chrome/Brave extension plus a tiny local helper app.
+
+The extension reads the visible ChatGPT conversation. The helper writes a clean Markdown note into your vault.
+
+```text
+ChatGPT -> browser extension -> 127.0.0.1 helper -> Obsidian vault
 ```
 
-## What you get
+## What it can do
 
-Each conversation becomes a note like this:
+- Save the visible ChatGPT conversation as Markdown.
+- Add YAML frontmatter with title, date, URL, tags, and save mode.
+- Save into a folder you choose inside your Obsidian vault.
+- Create summaries and main-idea notes with Ollama or your own AI provider key.
+- Keep provider keys out of the extension.
 
-```markdown
----
-title: "Weeknight pasta ideas"
-source: ChatGPT
-created: 2024-05-20
-model: "gpt-4o"
-tags: [chatgpt]
----
+## What it will not do
 
-# Weeknight pasta ideas
+- It will not silently auto-save your chats.
+- It will not write files directly from the browser extension.
+- It will not upload your conversations anywhere by itself.
+- It will not store OpenAI, Anthropic, Gemini, or other provider keys in Chrome.
 
-> **You** · 2024-05-20 10:13
+## Quick Windows setup
 
-Give me 2 quick weeknight pasta ideas.
+### 1. Get the project
 
-> **ChatGPT** · 2024-05-20 10:14
+Clone or download this repo somewhere normal, for example:
 
-1. **Cacio e pepe** — pecorino, black pepper, pasta water.
-2. **Aglio e olio** — garlic, olive oil, chili flakes, parsley.
+```text
+C:\Users\YOUR_NAME\Documents\save-to-obsidian
 ```
 
-It handles the annoying parts of ChatGPT's export for you:
+### 2. Set up the helper
 
-- **Branches.** When you regenerate or edit a message, ChatGPT keeps every version in a tree. This follows the *active* branch (the answers you actually kept) and ignores the dead ends.
-- **Hidden system messages** are skipped.
-- **Code blocks** keep their language and formatting.
-- **Messy titles** get turned into safe filenames, and same-name chats don't overwrite each other.
-- **Empty conversations** are skipped.
+Open PowerShell in the project folder:
 
-## How to use it
-
-**1. Get your export from ChatGPT.**
-In ChatGPT: **Settings → Data controls → Export data → Export**. You'll get an email with a `.zip` (can take a few minutes). Unzip it — the file you want is `conversations.json`.
-
-**2. Run the script.**
-You'll need [Node.js](https://nodejs.org) (v18+). Then:
-
-```bash
-node chatgpt-to-obsidian.mjs path/to/conversations.json
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-helper.ps1 -VaultPath "C:\Users\YOUR_NAME\Documents\Obsidian Vault"
 ```
 
-By default the notes land in a `./chatgpt-export` folder. To send them straight into your vault, add the folder as a second argument:
+That creates:
 
-```bash
-node chatgpt-to-obsidian.mjs conversations.json "/path/to/your/vault/ChatGPT"
+- `.venv`
+- `.env`
+- a random helper token
+- the Python packages
+
+### 3. Start the helper
+
+Double-click:
+
+```text
+start-helper.bat
 ```
 
-That's it. Open the folder in Obsidian and your chats are there.
+Leave that window open while saving chats.
 
-## Want to try it first?
+To check it:
 
-There's a `sample-conversations.json` in this repo with the same structure as a real export. Run the script against it to see what the output looks like before you touch your own data:
-
-```bash
-node chatgpt-to-obsidian.mjs sample-conversations.json
+```powershell
+Invoke-RestMethod http://127.0.0.1:8766/health
 ```
 
-## Re-running later
+You want:
 
-Run it again whenever you want a refresh. Notes use the conversation's date in the filename, so old chats overwrite cleanly (picking up any new messages) and new chats just get new files.
+```json
+{"ok":true}
+```
 
-## Live-saving from a custom GPT (optional)
+### 4. Load the extension
 
-This script does batch imports. If you'd rather save chats *as you have them*, there's a small bonus in [`custom-gpt/`](./custom-gpt) showing how to build a custom GPT that writes notes straight into a GitHub repo your vault syncs from. Read the limits there first — it only captures chats inside that one GPT.
+1. Open `chrome://extensions` or `brave://extensions`.
+2. Turn on `Developer mode`.
+3. Click `Load unpacked`.
+4. Pick the `extension` folder from this repo.
+5. Pin the extension if you want.
 
-## A note on your privacy
+### 5. Connect the extension to the helper
 
-Your `conversations.json` is your entire chat history — treat it like a diary. This repo's `.gitignore` is set up so you can't accidentally commit it. The script never sends your data anywhere; it just reads the file and writes markdown.
+Open the extension popup and click `Options`.
 
-## License
+Use:
 
-MIT — do whatever you like with it.
+```text
+Helper URL: http://127.0.0.1:8766
+Helper token: the HELPER_TOKEN value from .env
+```
+
+The token is local. It is just there so random web pages cannot ask your helper to write notes.
+
+### 6. Save a chat
+
+Open a ChatGPT conversation, click the extension, then click:
+
+```text
+Save full
+```
+
+Obsidian should see the new note right away.
+
+Default save folder:
+
+```text
+AI Chats\ChatGPT\Saved
+```
+
+## Summary and main idea
+
+`Save full` does not need AI.
+
+`Save summary` and `Save main idea` need an AI provider configured in the helper.
+
+Free/local option:
+
+```powershell
+winget install Ollama.Ollama
+ollama pull llama3.2
+ollama serve
+```
+
+Then keep this in `.env`:
+
+```env
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=llama3.2
+```
+
+Cloud providers are optional. Put those keys in `.env`, never in the extension.
+
+Supported helper providers:
+
+- `ollama`
+- `openai`
+- `anthropic`
+- `gemini`
+- `openai-compatible`
+
+## Screenshots
+
+![Saved state](media/popup-saved.png)
+
+![Options page](media/options.png)
+
+![Walkthrough](media/walkthrough.gif)
+
+## Build a beta zip
+
+Run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\package-extension.ps1
+```
+
+The zip lands in `dist\`.
+
+## Troubleshooting
+
+`Helper not running`
+
+Start `start-helper.bat`, then check `/health`.
+
+`Unauthorized`
+
+The helper token in extension options does not match `HELPER_TOKEN` in `.env`.
+
+`Could not extract conversation`
+
+Reload the ChatGPT tab and try again. ChatGPT changes its page HTML sometimes.
+
+`Ollama is not running`
+
+Start Ollama with:
+
+```powershell
+ollama serve
+```
+
+## Security basics
+
+- Helper listens on `127.0.0.1`.
+- Extension calls the helper with a local token.
+- Helper writes only inside the configured vault folder.
+- The extension never receives provider API keys.
+- `.env` is ignored by git.
+
+## More docs
+
+- [Privacy](PRIVACY.md)
+- [Security](SECURITY.md)
+- [Store listing draft](STORE_LISTING.md)
+- [Publishing guide](docs/PUBLISHING.md)
+- [Beta checklist](docs/BETA_RELEASE.md)

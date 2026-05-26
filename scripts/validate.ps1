@@ -38,9 +38,13 @@ print("icons ok", list(expected))
 
 Write-Host "== Secret scan =="
 $secretPattern = "sk-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{20,}|gsk_[A-Za-z0-9_-]{20,}|OPENAI_API_KEY=sk-[A-Za-z0-9_-]{20,}|ANTHROPIC_API_KEY=sk-ant-[A-Za-z0-9_-]{20,}|GEMINI_API_KEY=AIza[0-9A-Za-z_-]{20,}|GOOGLE_API_KEY=AIza[0-9A-Za-z_-]{20,}|OPENAI_COMPATIBLE_API_KEY=(sk-|sk-ant-|gsk_|AIza)[A-Za-z0-9_-]{20,}|HELPER_TOKEN=[A-Za-z0-9_-]{32,}"
-$secretHits = rg -n $secretPattern --glob "!*.env" --glob "!dist/**" --glob "!scripts/validate.ps1" .
+$secretHits = @(rg -n $secretPattern --glob "!*.env" --glob "!dist/**" --glob "!scripts/validate.ps1" . | Where-Object {
+    $_ -notmatch "\.env\.example:\d+:HELPER_TOKEN=change-this-to-a-long-random-local-secret"
+})
 if ($LASTEXITCODE -eq 0) {
-    Write-Error "Potential secret found outside ignored .env:`n$secretHits"
+    if ($secretHits.Count -gt 0) {
+        Write-Error "Potential secret found outside ignored .env:`n$($secretHits -join "`n")"
+    }
 }
 if ($LASTEXITCODE -gt 1) {
     throw "Secret scan failed"

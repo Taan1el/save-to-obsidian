@@ -1,10 +1,27 @@
 # Save to Obsidian
 
-Save ChatGPT conversations straight into your local Obsidian vault.
+Turn a ChatGPT conversation into a clean local Obsidian note in one click.
 
-No Markdown downloads. No copy-paste cleanup. No API keys in the browser.
+[![Release](https://img.shields.io/github/v/release/Taan1el/save-to-obsidian?include_prereleases&label=beta)](https://github.com/Taan1el/save-to-obsidian/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Local first](https://img.shields.io/badge/local--first-yes-6f42c1)](#why-local)
+[![Chrome MV3](https://img.shields.io/badge/Chrome-MV3-4285f4)](extension/manifest.json)
 
-![Save to Obsidian popup](media/popup-ready.png)
+No Markdown downloads. No copy-paste cleanup. No provider API keys in the browser.
+
+![Save to Obsidian walkthrough](media/walkthrough.gif)
+
+[Download the beta extension zip](https://github.com/Taan1el/save-to-obsidian/releases/latest) or jump to [Quick Windows setup](#quick-windows-setup).
+
+If this saves you time, starring the repo helps more Obsidian users find it.
+
+## Why local?
+
+- Your vault stays on your computer.
+- The extension talks only to your own `127.0.0.1` helper.
+- Full saves work without any AI provider.
+- Optional AI keys live in the helper `.env`, not in Chrome.
+- The helper writes only inside the Obsidian folder you configure.
 
 ## What this is
 
@@ -15,6 +32,8 @@ The extension reads the visible ChatGPT conversation. The helper writes a clean 
 ```text
 ChatGPT -> browser extension -> 127.0.0.1 helper -> Obsidian vault
 ```
+
+![Save to Obsidian popup](media/popup-ready.png)
 
 ## What it can do
 

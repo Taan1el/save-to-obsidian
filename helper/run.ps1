@@ -6,7 +6,8 @@ $EnvPath = Join-Path $ProjectRoot ".env"
 if (Test-Path -LiteralPath $EnvPath) {
     Get-Content -LiteralPath $EnvPath | ForEach-Object {
         if ($_ -match "^(?<key>[A-Za-z_][A-Za-z0-9_]*)=(?<value>.*)$") {
-            [Environment]::SetEnvironmentVariable($Matches.key, $Matches.value, "Process")
+            $value = $Matches.value.Trim().Trim('"').Trim("'")
+            [Environment]::SetEnvironmentVariable($Matches.key, $value, "Process")
         }
     }
 }

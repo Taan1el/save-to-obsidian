@@ -196,7 +196,7 @@ function normalizeErrorMessage(error) {
     return "Could not extract conversation";
   }
   if (raw.includes("Helper not running") || raw.includes("Failed to fetch")) return "Helper not running";
-  if (raw.includes("OPENAI_API_KEY")) return raw;
+  if (/(OPENAI|ANTHROPIC|GEMINI|GOOGLE|OPENAI_COMPATIBLE)_API_KEY|OPENAI_COMPATIBLE_MODEL/.test(raw)) return raw;
 
   return raw || "Save failed";
 }

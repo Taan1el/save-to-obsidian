@@ -21,6 +21,10 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 async function healthCheck(request) {
   try {
+    if (!validHelperUrl(request.helperUrl)) {
+      throw new Error("Invalid helper URL");
+    }
+
     const response = await fetch(`${request.helperUrl}/health`, {
       method: "GET",
       cache: "no-store"
@@ -33,6 +37,10 @@ async function healthCheck(request) {
 
 async function diagnostics(request) {
   try {
+    if (!validHelperUrl(request.helperUrl)) {
+      throw new Error("Invalid helper URL");
+    }
+
     const response = await fetch(`${request.helperUrl}/diagnostics`, {
       method: "GET",
       cache: "no-store",
@@ -49,6 +57,10 @@ async function diagnostics(request) {
 
 async function saveConversation(request) {
   try {
+    if (!validHelperUrl(request.helperUrl)) {
+      return { ok: false, error: "Invalid helper URL" };
+    }
+
     const response = await fetch(`${request.helperUrl}/save`, {
       method: "POST",
       headers: {
@@ -80,4 +92,8 @@ async function safeJson(response) {
   } catch {
     return null;
   }
+}
+
+function validHelperUrl(url) {
+  return /^http:\/\/(127\.0\.0\.1|localhost):\d+$/i.test(String(url || ""));
 }

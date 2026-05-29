@@ -94,6 +94,9 @@ async function saveConversation(mode, sourceButton) {
     if (!helperToken) {
       throw new Error("Set helper token in Options");
     }
+    if (!/^[A-Za-z0-9_-]+$/.test(helperToken)) {
+      throw new Error("Bad helper token");
+    }
     if (!validHelperUrl(helperBaseUrl)) {
       throw new Error("Invalid helper URL");
     }
@@ -190,6 +193,9 @@ function normalizeErrorMessage(error) {
   const raw = error?.message || "";
 
   if (raw.includes("Set helper token")) return "Set helper token in Options";
+  if (raw.includes("Bad helper token") || /ISO-8859-1/i.test(raw)) {
+    return "Helper token has invalid characters. Re-save it in Options.";
+  }
   if (raw.includes("Invalid helper URL")) return "Invalid helper URL";
   if (raw.includes("Unauthorized")) return "Unauthorized";
   if (raw.includes("Could not extract conversation") || raw.includes("Receiving end does not exist") || raw.includes("Could not establish connection")) {

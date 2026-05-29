@@ -18,14 +18,24 @@ async function saveOptions() {
     statusNode.textContent = "Use a local helper URL like http://127.0.0.1:8766";
     return;
   }
-  if (!helperToken.value.trim()) {
+
+  // Drop any whitespace a paste may introduce.
+  const cleanedToken = helperToken.value.replace(/\s+/g, "");
+  if (!cleanedToken) {
     statusNode.textContent = "Helper token is required";
     return;
   }
+  // The helper token is base64url/hex. Anything else (smart punctuation like an
+  // en-dash, or a zero-width character) cannot be sent in an HTTP header.
+  if (!/^[A-Za-z0-9_-]+$/.test(cleanedToken)) {
+    statusNode.textContent = "Token has invalid characters. Re-copy it as plain text.";
+    return;
+  }
 
+  helperToken.value = cleanedToken;
   await chrome.storage.local.set({
     helperUrl: normalizedUrl,
-    helperToken: helperToken.value.trim()
+    helperToken: cleanedToken
   });
   statusNode.textContent = "Settings saved";
 }

@@ -36,6 +36,7 @@ class HelperTestCase(unittest.TestCase):
             "GOOGLE_API_KEY",
             "OPENAI_COMPATIBLE_API_KEY",
             "OPENAI_COMPATIBLE_MODEL",
+            "MAX_REQUEST_BYTES",
         ):
             os.environ.pop(key, None)
         self.client = TestClient(app)
@@ -185,6 +186,15 @@ class HelperTestCase(unittest.TestCase):
                 os.environ.pop("AI_PROVIDER", None)
             else:
                 os.environ["AI_PROVIDER"] = old_value
+
+    def test_max_request_bytes_uses_positive_integer_or_default(self) -> None:
+        os.environ["MAX_REQUEST_BYTES"] = "12345"
+        self.assertEqual(load_settings().max_request_bytes, 12345)
+
+        for value in ("0", "-5", "not-a-number"):
+            with self.subTest(value=value):
+                os.environ["MAX_REQUEST_BYTES"] = value
+                self.assertEqual(load_settings().max_request_bytes, 1_000_000)
 
 
 if __name__ == "__main__":

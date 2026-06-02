@@ -42,3 +42,7 @@ async function saveOptions() {
 
 saveButton.addEventListener("click", saveOptions);
 loadOptions();
+
+function validHelperToken(token) {
+  return /^[A-Za-z0-9_-]+$/.test(token);
+}

@@ -40,6 +40,9 @@ async function diagnostics(request) {
     if (!validHelperUrl(request.helperUrl)) {
       throw new Error("Invalid helper URL");
     }
+    if (!validHelperToken(request.helperToken)) {
+      throw new Error("Invalid helper token");
+    }
 
     const response = await fetch(`${request.helperUrl}/diagnostics`, {
       method: "GET",
@@ -59,6 +62,9 @@ async function saveConversation(request) {
   try {
     if (!validHelperUrl(request.helperUrl)) {
       return { ok: false, error: "Invalid helper URL" };
+    }
+    if (!validHelperToken(request.helperToken)) {
+      return { ok: false, error: "Invalid helper token" };
     }
 
     const response = await fetch(`${request.helperUrl}/save`, {
@@ -96,4 +102,8 @@ async function safeJson(response) {
 
 function validHelperUrl(url) {
   return /^http:\/\/(127\.0\.0\.1|localhost):\d+$/i.test(String(url || ""));
+}
+
+function validHelperToken(token) {
+  return /^[A-Za-z0-9_-]+$/.test(String(token || ""));
 }

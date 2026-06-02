@@ -8,6 +8,7 @@ from pathlib import Path
 AI_PROVIDERS = {"ollama", "openai", "anthropic", "gemini", "openai-compatible"}
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV_PATH = PROJECT_ROOT / ".env"
+DEFAULT_MAX_REQUEST_BYTES = 1_000_000
 
 
 def _load_env_file(path: Path) -> None:
@@ -22,6 +23,14 @@ def _load_env_file(path: Path) -> None:
         key = key.strip()
         value = value.strip().strip('"').strip("'")
         os.environ.setdefault(key, value)
+
+
+def _parse_positive_int(value: str | None, default: int) -> int:
+    try:
+        parsed = int(value or "")
+    except ValueError:
+        return default
+    return parsed if parsed > 0 else default
 
 
 @dataclass(frozen=True)
@@ -70,7 +79,10 @@ def load_settings() -> Settings:
     openai_compatible_model = os.environ.get("OPENAI_COMPATIBLE_MODEL", "")
     helper_dev = os.environ.get("HELPER_DEV", "0") == "1"
     allowed_extension_origin = os.environ.get("ALLOWED_EXTENSION_ORIGIN") or None
-    max_request_bytes = int(os.environ.get("MAX_REQUEST_BYTES", "1000000"))
+    max_request_bytes = _parse_positive_int(
+        os.environ.get("MAX_REQUEST_BYTES"),
+        DEFAULT_MAX_REQUEST_BYTES,
+    )
 
     if not vault_path_raw:
         raise RuntimeError("OBSIDIAN_VAULT_PATH is required.")

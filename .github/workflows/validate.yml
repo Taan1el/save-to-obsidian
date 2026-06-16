@@ -33,7 +33,7 @@ jobs:
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\package-extension.ps1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: save-to-obsidian-extension
           path: dist/save-to-obsidian-extension.zip

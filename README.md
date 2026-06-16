@@ -2,16 +2,17 @@
 
 Turn a ChatGPT conversation into a clean local Obsidian note in one click.
 
-[![Release](https://img.shields.io/github/v/release/Taan1el/save-to-obsidian?include_prereleases&label=beta)](https://github.com/Taan1el/save-to-obsidian/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Taan1el/save-to-obsidian?include_prereleases&label=beta)](https://github.com/Taan1el/save-to-obsidian/releases/tag/v0.1.0-beta)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Local first](https://img.shields.io/badge/local--first-yes-6f42c1)](#why-local)
 [![Chrome MV3](https://img.shields.io/badge/Chrome-MV3-4285f4)](extension/manifest.json)
+[![Validate](https://github.com/Taan1el/save-to-obsidian/actions/workflows/validate.yml/badge.svg)](https://github.com/Taan1el/save-to-obsidian/actions/workflows/validate.yml)
 
 No Markdown downloads. No copy-paste cleanup. No provider API keys in the browser.
 
 ![Save to Obsidian walkthrough](media/walkthrough.gif)
 
-[Download the beta extension zip](https://github.com/Taan1el/save-to-obsidian/releases/latest) or jump to [Quick Windows setup](#quick-windows-setup).
+[Download the beta extension zip](https://github.com/Taan1el/save-to-obsidian/releases/tag/v0.1.0-beta) or jump to [Quick Windows setup](#quick-windows-setup).
 
 If this saves you time, starring the repo helps more Obsidian users find it.
 
@@ -104,6 +105,8 @@ You want:
 3. Click `Load unpacked`.
 4. Pick the `extension` folder from this repo.
 5. Pin the extension if you want.
+
+If you downloaded the release zip instead of cloning the repo, unzip it and pick the unzipped folder that contains `manifest.json`.
 
 ### 5. Connect the extension to the helper
 

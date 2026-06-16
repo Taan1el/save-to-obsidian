@@ -16,6 +16,9 @@ helper/logs/
 # packaged builds
 dist/
 
+# local Chrome Web Store upload assets
+store-assets/
+
 # private exports and local data
 conversations.json
 *.zip

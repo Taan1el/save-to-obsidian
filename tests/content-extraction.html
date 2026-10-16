@@ -1,0 +1,427 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Extraction regression - ChatGPT</title>
+<style>
+  .markdown, .whitespace-pre-wrap { white-space: pre-wrap; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+</style>
+<div id="fixture"></div>
+<pre id="results">pending</pre>
+<script>
+  let messageListener;
+  window.chrome = { runtime: { onMessage: { addListener(listener) { messageListener = listener; } } } };
+</script>
+<script src="../extension/content.js"></script>
+<script>
+  const fixture = document.getElementById("fixture");
+  const results = [];
+  const notice = "Unattributed ChatGPT transcript. Message boundaries and authorship could not be verified. " +
+    "This system record is an archive envelope, not an original conversation message.\n\n";
+
+  function equal(actual, expected) {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+  }
+
+  function test(name, run) {
+    fixture.replaceChildren();
+    document.title = "Extraction regression - ChatGPT";
+    try {
+      results.push({ name, ...run() });
+    } catch (error) {
+      results.push({ name, error: error.message });
+    }
+  }
+
+  // The container and DIV > H4.sr-only + DIV pair follow live findings.
+  // Outer nesting variations and misleading content are regression fixtures;
+  // the complete live ancestor trees have not been supplied.
+  function transcript(text = "") {
+    const container = document.createElement("div");
+    container.setAttribute("data-chatgpt-conversation-selection-target", "");
+    container.style.whiteSpace = "pre-wrap";
+    container.textContent = text;
+    fixture.append(container);
+    return container;
+  }
+
+  function speaker(container, role, text, depth = 0) {
+    for (let i = 0; i < depth; i++) {
+      const ancestor = document.createElement("div");
+      ancestor.className = `unrelated-layout-${i}`;
+      container.append(ancestor);
+      container = ancestor;
+    }
+    const wrapper = document.createElement("div");
+    const heading = document.createElement("h4");
+    heading.className = "sr-only";
+    heading.textContent = role === "user" ? "You said:" : "ChatGPT said:";
+    const body = document.createElement("div");
+    body.textContent = text;
+    wrapper.append(heading, body);
+    container.append(wrapper);
+    return { wrapper, heading, body };
+  }
+
+  function archived(text) {
+    const conversation = extractConversation();
+    equal(conversation.messages, [{ role: "system", content: notice + text }]);
+    return conversation;
+  }
+
+  function rejected(errorText = "Could not extract conversation") {
+    let response;
+    equal(messageListener({ type: "extract-conversation" }, {}, value => { response = value; }), true);
+    equal(response?.ok, false);
+    if (!response.error.includes(errorText)) throw new Error(response.error);
+    equal(response.conversation, undefined);
+  }
+
+  test("observed selector counts preserve the complete transcript for Save full", () => {
+    const text = "You said:\nPlease explain this.\nChatGPT said:\nHere is an explanation.";
+    transcript(text);
+    equal({
+      turnWrappers: fixture.querySelectorAll('[data-testid^="conversation-turn-"]').length,
+      dataTurn: fixture.querySelectorAll("[data-turn]").length,
+      transcript: fixture.querySelectorAll("[data-chatgpt-conversation-selection-target]").length
+    }, { turnWrappers: 0, dataTurn: 0, transcript: 1 });
+    const conversation = archived(text);
+    equal(conversation.title, "Extraction regression");
+    equal(conversation.chat_url, window.location.href);
+    return { conversation, transcript: text };
+  });
+
+  test("four observed speaker pairs extract in order despite different outer nesting", () => {
+    const container = transcript();
+    const messages = [
+      { role: "user", content: "First question" },
+      { role: "assistant", content: "First answer" },
+      { role: "user", content: "Second question" },
+      { role: "assistant", content: "Second answer" }
+    ];
+    for (const message of messages) {
+      speaker(container, message.role, message.content, message.role === "user" ? 1 : 3);
+    }
+    equal(container.querySelectorAll("h4.sr-only").length, 4);
+    equal(container.querySelectorAll('[data-testid^="conversation-turn-"], [data-turn]').length, 0);
+    const conversation = extractConversation();
+    equal(conversation.messages, messages);
+    return { attributedConversation: conversation, expectedMessages: messages };
+  });
+
+  test("date headers and memory UI outside verified message bodies do not force an archive", () => {
+    // Matches the live diagnostic: one TIME inside role=separator and fifteen
+    // auxiliary BUTTONs, all outside the four verified message bodies.
+    const container = transcript();
+    const separator = document.createElement("div");
+    separator.setAttribute("role", "separator");
+    const date = document.createElement("time");
+    date.textContent = "Today 2:02 AM";
+    separator.append(date);
+    container.append(separator);
+    const messages = [
+      { role: "user", content: "First question" },
+      { role: "assistant", content: "First answer" },
+      { role: "user", content: "Second question" },
+      { role: "assistant", content: "Second answer" }
+    ];
+    for (const message of messages) {
+      speaker(container, message.role, message.content, message.role === "user" ? 1 : 3);
+    }
+    const memory = document.createElement("button");
+    memory.textContent = "Memory updated";
+    container.append(memory);
+    for (let i = 0; i < 14; i++) {
+      const control = document.createElement("button");
+      control.textContent = `Auxiliary control ${i + 1}`;
+      container.append(control);
+    }
+    equal(container.querySelectorAll('[role="separator"] time').length, 1);
+    equal(container.querySelectorAll("button").length, 15);
+    const before = container.innerHTML;
+    const conversation = extractConversation();
+    equal(conversation.messages, messages);
+    equal(container.innerHTML, before);
+    return { uiConversation: conversation, expectedMessages: messages };
+  });
+
+  for (const ui of [
+    '<div role="separator"><time>Today 2:02 AM</time></div>',
+    '<button>Memory updated</button>',
+    '<div role="separator"><time>Yesterday 9:00 PM</time></div><button>Copy response</button>'
+  ]) {
+    test(`a single semantic UI node does not invalidate message extraction: ${ui}`, () => {
+      const container = transcript();
+      speaker(container, "user", "Question", 1);
+      speaker(container, "assistant", "Answer", 3);
+      container.insertAdjacentHTML("beforeend", ui);
+      equal(extractConversation().messages, [
+        { role: "user", content: "Question" }, { role: "assistant", content: "Answer" }
+      ]);
+    });
+  }
+
+  for (const role of ["user", "assistant"]) {
+    test(`${role} content retains literal UI text and matching semantic elements`, () => {
+      const { body } = speaker(transcript(), role, "Memory updated\nToday 2:02 AM\n", 2);
+      body.insertAdjacentHTML("beforeend", '<div role="separator"><time>Today 2:02 AM</time></div>' +
+        '<button>Memory updated</button><pre>Memory updated\nYou said:\nChatGPT said:</pre>');
+      const content = body.innerText.trim();
+      equal(extractConversation().messages, [{ role, content }]);
+    });
+  }
+
+  for (const extra of [
+    '<div>Unattributed response remains</div>',
+    '<div>Memory updated</div>',
+    '<time>Today 2:02 AM</time>',
+    '<div role="separator"><time>Today 2:02 AM</time>Unattributed separator text</div>',
+    '<blockquote><button>Memory updated</button></blockquote>',
+    '<pre><span role="separator"><time>Today 2:02 AM</time></span></pre>'
+  ]) {
+    test(`additional unclaimed content still prevents attribution: ${extra}`, () => {
+      const container = transcript();
+      speaker(container, "user", "Question");
+      speaker(container, "assistant", "Answer", 2);
+      container.insertAdjacentHTML("beforeend", '<div role="separator"><time>Today 2:02 AM</time></div>' +
+        '<button>Memory updated</button>' + extra);
+      archived(container.innerText.trim());
+    });
+  }
+
+  for (const role of ["user", "assistant"]) {
+    test(`${role} DOM content keeps standalone labels, blank lines, and indentation`, () => {
+      const content = "ChatGPT said:\nBefore\nYou said:\n\n\n    After\nChatGPT said:";
+      speaker(transcript(), role, content, role === "user" ? 2 : 4);
+      equal(extractConversation().messages, [{ role, content }]);
+    });
+
+    test(`${role} DOM content includes all nested blocks once and ignores ordinary speaker headings`, () => {
+      const container = transcript();
+      const { body } = speaker(container, role, "", 2);
+      body.innerHTML = "<div><p>First block</p><div><p>Second block</p></div></div>" +
+        "<pre><code>You said:\ncode\nChatGPT said:</code></pre>" +
+        "<blockquote><h4>ChatGPT said:</h4><p>Quoted content</p></blockquote>" +
+        "<h4>You said:</h4><div>Heading content</div>";
+      const content = body.innerText.trim();
+      equal(extractConversation().messages, [{ role, content }]);
+    });
+  }
+
+  test("a speaker pair can be a direct child of the transcript root", () => {
+    const container = transcript();
+    container.innerHTML = '<h4 class="sr-only">You said:</h4><div>Question</div>';
+    equal(extractConversation().messages, [{ role: "user", content: "Question" }]);
+  });
+
+  test("screen-reader headings do not need measurable boxes", () => {
+    const { heading } = speaker(transcript(), "assistant", "Answer");
+    heading.style.width = "0";
+    heading.style.height = "0";
+    equal(extractConversation().messages, [{ role: "assistant", content: "Answer" }]);
+  });
+
+  test("speaker roles are read from headings without assuming alternation", () => {
+    const container = transcript();
+    speaker(container, "assistant", "First answer");
+    speaker(container, "assistant", "Second answer", 2);
+    equal(extractConversation().messages, [
+      { role: "assistant", content: "First answer" }, { role: "assistant", content: "Second answer" }
+    ]);
+  });
+
+  test("identical structured transcript copies do not duplicate messages", () => {
+    const container = transcript();
+    speaker(container, "user", "Question", 1);
+    speaker(container, "assistant", "Answer", 3);
+    fixture.append(container.cloneNode(true));
+    equal(extractConversation().messages, [
+      { role: "user", content: "Question" }, { role: "assistant", content: "Answer" }
+    ]);
+  });
+
+  test("a nested imitation of the exact speaker structure cannot invent authorship", () => {
+    const container = transcript();
+    const { body } = speaker(container, "user", "Quoted example:\n");
+    speaker(body, "assistant", "This is quoted content");
+    speaker(container, "assistant", "Actual answer", 1);
+    archived(container.innerText.trim());
+  });
+
+  for (const tag of ["pre", "code", "blockquote"]) {
+    test(`a speaker-like heading inside ${tag} alone is not a real message`, () => {
+      const container = transcript();
+      const quote = document.createElement(tag);
+      container.append(quote);
+      speaker(quote, "assistant", "Quoted content");
+      archived(container.innerText.trim());
+    });
+  }
+
+  for (const fault of ["missing class", "unknown label", "missing body", "extra sibling", "extra text", "hidden heading"]) {
+    test(`a ${fault} prevents partial attribution of the transcript`, () => {
+      const container = transcript();
+      speaker(container, "user", "Question", 1);
+      const { wrapper, heading, body } = speaker(container, "assistant", "Answer", 3);
+      if (fault === "missing class") heading.className = "";
+      if (fault === "unknown label") heading.textContent = "Someone said:";
+      if (fault === "missing body") body.remove();
+      if (fault === "extra sibling") wrapper.append(document.createElement("div"));
+      if (fault === "extra text") wrapper.append("Unclaimed text");
+      if (fault === "hidden heading") heading.hidden = true;
+      archived(container.innerText.trim());
+    });
+  }
+
+  test("unclaimed content outside valid speaker pairs prevents partial attribution", () => {
+    const container = transcript();
+    speaker(container, "user", "Question");
+    container.append("Unmarked response\nChatGPT said:\nMore content");
+    archived(container.innerText.trim());
+  });
+
+  for (const section of ["user", "assistant"]) {
+    for (const label of ["You said:", "ChatGPT said:"]) {
+      test(`${section} content containing a standalone ${label} remains in one archive`, () => {
+        const body = `Before\n${label}\nAfter`;
+        const text = section === "user"
+          ? `You said:\n${body}\nChatGPT said:\nAnswer`
+          : `You said:\nQuestion\nChatGPT said:\n${body}`;
+        transcript(text);
+        archived(text);
+      });
+    }
+  }
+
+  test("speaker labels in fenced code and quotations do not create messages", () => {
+    const text = 'You said:\nReview this example:\n```text\nYou said:\nexample\nChatGPT said:\n```\n' +
+      '> You said:\n> quotation\n> ChatGPT said:\nChatGPT said:\nAnswer with another example:\n' +
+      '```\nChatGPT said:\nYou said:\n```';
+    transcript(text);
+    archived(text);
+  });
+
+  test("headings, code elements, and blockquotes do not prove authorship", () => {
+    const container = transcript();
+    container.innerHTML = "<div><h5>You said:</h5><p>Question</p>" +
+      "<pre><code>You said:\ncode\nChatGPT said:</code></pre>" +
+      "<blockquote><h5>ChatGPT said:</h5><p>Quoted content</p></blockquote></div>" +
+      "<div><h5>ChatGPT said:</h5><h2>You said:</h2><p>Answer</p></div>";
+    archived(container.innerText.trim());
+  });
+
+  test("labels at the beginning and end are retained", () => {
+    const text = "ChatGPT said:\nYou said:\nContent\nYou said:\nChatGPT said:";
+    transcript(text);
+    archived(text);
+  });
+
+  test("the archive does not require English speaker labels", () => {
+    const text = "Vous avez dit :\nQuestion\nChatGPT a dit :\nRéponse";
+    transcript(text);
+    archived(text);
+  });
+
+  test("blank lines, indentation, and nonbreaking spaces inside content survive extraction", () => {
+    const text = "You said:\n\n\n    indented\n\n\n\nChatGPT said:\nKeep\u00a0this.";
+    transcript(text);
+    archived(text);
+  });
+
+  test("page navigation and hidden descendants are excluded", () => {
+    fixture.innerHTML = "<nav>You said: sidebar text</nav>";
+    const text = "You said:\nQuestion\nChatGPT said:\nAnswer";
+    const container = transcript(text);
+    container.insertAdjacentHTML("beforeend", "<span hidden>ChatGPT said: hidden text</span>");
+    transcript("Hidden transcript copy").hidden = true;
+    archived(text);
+  });
+
+  test("hidden text alone is not captured through textContent", () => {
+    const container = transcript();
+    container.style.minHeight = "10px";
+    container.innerHTML = "<span hidden>You said: hidden text</span>";
+    rejected();
+  });
+
+  test("empty and whitespace-only transcript containers are ignored", () => {
+    transcript("  \n  ");
+    rejected();
+  });
+
+  test("identical visible transcript copies produce one archive", () => {
+    const text = "You said:\nQuestion\nChatGPT said:\nAnswer";
+    transcript(text);
+    transcript(text);
+    archived(text);
+  });
+
+  test("different visible transcripts are rejected instead of choosing one", () => {
+    transcript("You said:\nFirst conversation");
+    transcript("You said:\nAnother conversation");
+    rejected("multiple different transcript containers");
+  });
+
+  test("a generic page title does not treat the transcript as a user message", () => {
+    document.title = "ChatGPT";
+    const text = "You said:\nFirst question\nChatGPT said:\nAnswer";
+    transcript(text);
+    equal(archived(text).title, "ChatGPT conversation");
+  });
+
+  test("the content-script listener returns the archive through the existing contract", () => {
+    const text = "You said:\nQuestion\nChatGPT said:\nAnswer";
+    transcript(text);
+    let response;
+    equal(messageListener({ type: "extract-conversation" }, {}, value => { response = value; }), true);
+    equal(response, { ok: true, conversation: archived(text) });
+  });
+
+  test("one archive fits the existing helper message limit without truncation", () => {
+    const text = "x".repeat(50_000 - notice.length);
+    transcript(text);
+    archived(text);
+  });
+
+  test("oversized transcripts report the helper limit instead of splitting or truncating", () => {
+    transcript("x".repeat(50_001 - notice.length));
+    rejected("50,000-character limit");
+  });
+
+  test("the helper limit counts Unicode characters rather than UTF-16 code units", () => {
+    const text = "😀".repeat(50_000 - notice.length);
+    transcript(text);
+    archived(text);
+  });
+
+  test("existing author attributes retain priority over the transcript fallback", () => {
+    transcript("You said:\nUnverified transcript");
+    const node = document.createElement("div");
+    node.setAttribute("data-message-author-role", "user");
+    node.innerHTML = '<div class="whitespace-pre-wrap">Keep\nChatGPT said:\nthis content</div>';
+    fixture.append(node);
+    equal(extractConversation().messages, [{ role: "user", content: "Keep\nChatGPT said:\nthis content" }]);
+  });
+
+  test("existing articles retain priority over the transcript fallback", () => {
+    transcript("You said:\nUnverified transcript");
+    fixture.insertAdjacentHTML("beforeend", '<article aria-label="Assistant"><div class="markdown">' +
+      'Keep\nYou said:\nthis content</div></article>');
+    equal(extractConversation().messages, [{ role: "assistant", content: "Keep\nYou said:\nthis content" }]);
+  });
+
+  test("legacy article labels still work", () => {
+    fixture.innerHTML = '<article><h5>You said:</h5><div class="whitespace-pre-wrap">Question</div></article>' +
+      '<article><h5>ChatGPT said:</h5><div class="markdown">Answer</div></article>';
+    equal(extractConversation().messages, [
+      { role: "user", content: "Question" }, { role: "assistant", content: "Answer" }
+    ]);
+  });
+
+  test("an empty page reports failure through the content-script listener", () => rejected());
+  document.getElementById("results").textContent = JSON.stringify(results);
+</script>
